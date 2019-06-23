@@ -2,9 +2,21 @@
 
 
 #include "RPGCharacterBase.h"
+#include "Abilities/RPGAbilitySystemComponent.h"
+#include "Abilities/RPGAttributeSet.h"
 
 // Sets default values
 ARPGCharacterBase::ARPGCharacterBase()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	AttributeSet = CreateDefaultSubobject<URPGAttributeSet>(TEXT("AttributeSet"));
+}
+
+int ARPGCharacterBase::GetHealth() const
+{
+	return AttributeSet->GetHealth();
+}
+
+int ARPGCharacterBase::GetMaxHealth() const
+{
+	return AttributeSet->GetMaxHealth();
 }

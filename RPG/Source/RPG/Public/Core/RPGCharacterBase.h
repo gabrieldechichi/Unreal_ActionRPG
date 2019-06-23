@@ -6,6 +6,9 @@
 #include "GameFramework/Character.h"
 #include "RPGCharacterBase.generated.h"
 
+class URPGAbilitySystemComponent;
+class URPGAttributeSet;
+
 UCLASS()
 class RPG_API ARPGCharacterBase : public ACharacter
 {
@@ -13,4 +16,13 @@ class RPG_API ARPGCharacterBase : public ACharacter
 
 public:
 	ARPGCharacterBase();
+
+	UFUNCTION(BlueprintCallable)
+	int GetHealth() const;
+
+	UFUNCTION(BlueprintCallable)
+	int GetMaxHealth() const;
+
+protected:
+	URPGAttributeSet* AttributeSet;
 };
