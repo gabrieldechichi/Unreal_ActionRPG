@@ -6,8 +6,18 @@
 
 URPGAttributeSet::URPGAttributeSet()
 	: Health(1.f)
-	, MaxHealth(200.f)
+	, MaxHealth(1.f)
 {
+}
+
+void URPGAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
+{
+	Super::PreAttributeChange(Attribute, NewValue);
+
+	if (Attribute == GetMaxHealthAttribute())
+	{
+		AdjustAttributeForNewMax(Health, MaxHealth, NewValue, GetHealthAttribute());
+	}
 }
 
 void URPGAttributeSet::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
@@ -16,6 +26,20 @@ void URPGAttributeSet::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty
 
 	DOREPLIFETIME(URPGAttributeSet, Health);
 	DOREPLIFETIME(URPGAttributeSet, MaxHealth);
+}
+
+void URPGAttributeSet::AdjustAttributeForNewMax(FGameplayAttributeData& AffectedAttribute, FGameplayAttributeData& MaxAttribute, float NewMaxValue, const FGameplayAttribute& AffectedAttributeProperty)
+{
+	UAbilitySystemComponent* AbilityComp = GetOwningAbilitySystemComponent();
+	const float CurrentMaxValue = MaxAttribute.GetCurrentValue();
+	if (!FMath::IsNearlyEqual(CurrentMaxValue, NewMaxValue) && AbilityComp)
+	{
+		const float CurrentRatio = CurrentMaxValue > 0.0f
+			? AffectedAttribute.GetCurrentValue() / CurrentMaxValue
+			: 1.0f;
+		const float NewValue = NewMaxValue * CurrentRatio;
+		AbilityComp->ApplyModToAttributeUnsafe(AffectedAttributeProperty, EGameplayModOp::Override, NewValue);
+	}
 }
 
 void URPGAttributeSet::OnRep_Health()

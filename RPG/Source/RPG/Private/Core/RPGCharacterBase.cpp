@@ -35,7 +35,7 @@ void ARPGCharacterBase::AddStartupGameplayAbilities()
 		{
 			FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
 			EffectContext.AddSourceObject(this);
-			AbilitySystemComponent->ApplyGameplayEffectToSelf(GameplayEffect->GetDefaultObject<UGameplayEffect>(), 20.0f, EffectContext);
+			AbilitySystemComponent->ApplyGameplayEffectToSelf(GameplayEffect->GetDefaultObject<UGameplayEffect>(), 1.0f, EffectContext);
 		}
 
 		bAbilitiesInitialized = true;
