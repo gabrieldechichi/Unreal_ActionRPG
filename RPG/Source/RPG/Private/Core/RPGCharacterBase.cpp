@@ -3,6 +3,7 @@
 
 #include "RPGCharacterBase.h"
 #include "GameplayEffect.h"
+#include "Abilities/GameplayAbility.h"
 #include "Abilities/RPGAbilitySystemComponent.h"
 #include "Abilities/RPGAttributeSet.h"
 
@@ -55,4 +56,21 @@ void ARPGCharacterBase::PossessedBy(AController* NewController)
 UAbilitySystemComponent* ARPGCharacterBase::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
+}
+
+bool ARPGCharacterBase::ActivateAbility(TSubclassOf<UGameplayAbility> Ability, bool bAllowRemoteActivation)
+{
+	if (AbilitySystemComponent)
+	{
+		return AbilitySystemComponent->TryActivateAbilityByClass(Ability, bAllowRemoteActivation);
+	}
+	return false;
+}
+
+void ARPGCharacterBase::Temp_GiveAbility(TSubclassOf<UGameplayAbility> Ability)
+{
+	if (AbilitySystemComponent)
+	{
+		AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(Ability, 1.0f, INDEX_NONE, this));
+	}
 }

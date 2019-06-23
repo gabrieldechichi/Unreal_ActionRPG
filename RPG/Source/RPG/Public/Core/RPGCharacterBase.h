@@ -10,6 +10,7 @@
 class URPGAbilitySystemComponent;
 class URPGAttributeSet;
 class UGameplayEffect;
+class UGameplayAbility;
 
 UCLASS()
 class RPG_API ARPGCharacterBase : public ACharacter, public IAbilitySystemInterface
@@ -24,6 +25,12 @@ public:
 	// Inherited via IAbilitySystemInterface
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	//
+
+	UFUNCTION(BlueprintCallable, Category = Abilities)
+	bool ActivateAbility(TSubclassOf<UGameplayAbility> Ability, bool bAllowRemoteActivation = true);
+
+	UFUNCTION(BlueprintCallable, Category = Abilities)
+	void Temp_GiveAbility(TSubclassOf<UGameplayAbility> Ability);
 
 	UFUNCTION(BlueprintCallable)
 	int GetHealth() const;

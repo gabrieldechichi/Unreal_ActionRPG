@@ -2,6 +2,7 @@
 
 
 #include "RPGAttributeSet.h"
+#include "GameplayEffectExtension.h"
 #include "RPG.h"
 
 URPGAttributeSet::URPGAttributeSet()
@@ -17,6 +18,14 @@ void URPGAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, f
 	if (Attribute == GetMaxHealthAttribute())
 	{
 		AdjustAttributeForNewMax(Health, MaxHealth, NewValue, GetHealthAttribute());
+	}
+}
+
+void URPGAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
+{
+	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
+	{
+		SetHealth(FMath::Clamp(GetHealth(), 0.0f, GetMaxHealth()));
 	}
 }
 
