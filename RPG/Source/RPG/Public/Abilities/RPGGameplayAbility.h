@@ -16,6 +16,8 @@ class RPG_API URPGGameplayAbility : public UGameplayAbility
 public:
 	URPGGameplayAbility() {};
 
+	virtual bool CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags /* = nullptr */, const FGameplayTagContainer* TargetTags /* = nullptr */, OUT FGameplayTagContainer* OptionalRelevantTags /* = nullptr */) const override;
+
 	UFUNCTION(BlueprintCallable, Category = Ability)
 	virtual TArray<FActiveGameplayEffectHandle> ApplyEffectsToSelf();
 
