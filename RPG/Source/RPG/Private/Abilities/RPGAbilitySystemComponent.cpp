@@ -2,4 +2,10 @@
 
 
 #include "RPGAbilitySystemComponent.h"
+#include "AbilitySystemGlobals.h"
 
+
+URPGAbilitySystemComponent* URPGAbilitySystemComponent::GetAbilitySystemComonentFromActor(const AActor* Actor, bool LookForComponent)
+{
+	return Cast<URPGAbilitySystemComponent>(UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(Actor, LookForComponent));
+}

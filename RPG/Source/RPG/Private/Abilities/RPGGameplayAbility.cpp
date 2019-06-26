@@ -2,15 +2,58 @@
 
 
 #include "RPGGameplayAbility.h"
+#include "Core/RPGCharacterBase.h"
+#include "Abilities/RPGTargetType.h"
+#include "Abilities/RPGAbilitySystemComponent.h"
 
-TArray<FActiveGameplayEffectHandle> URPGGameplayAbility::ApplyEffectsToSelf()
+TArray<FActiveGameplayEffectHandle> URPGGameplayAbility::ApplyEffectContainer(FGameplayTag EventTag, const FGameplayEventData& EventData, int32 OverrideGameplayLevel)
 {
-	TArray<FActiveGameplayEffectHandle> AllEffects;
+	return ApplyEffectContainerSpec(MakeEffectContainerSpec(EventTag, EventData, OverrideGameplayLevel));
+}
 
-	for (TSubclassOf<UGameplayEffect> Effect : Effects)
+TArray<FActiveGameplayEffectHandle> URPGGameplayAbility::ApplyEffectContainerSpec(const FRPGGameplayEffectContainerSpec ContainerSpec)
+{
+	TArray<FActiveGameplayEffectHandle> EffectHandles;
+	for (const FGameplayEffectSpecHandle& EffectHandle : ContainerSpec.TargetGameplayEffectSpecs)
 	{
-		FGameplayEffectSpecHandle SpecHandle = MakeOutgoingGameplayEffectSpec(Effect);
-		AllEffects.Add(K2_ApplyGameplayEffectSpecToOwner(SpecHandle));
+		EffectHandles.Append(K2_ApplyGameplayEffectSpecToTarget(EffectHandle, ContainerSpec.TargetData));
 	}
-	return AllEffects;
+	return EffectHandles;
+}
+
+FRPGGameplayEffectContainerSpec URPGGameplayAbility::MakeEffectContainerSpec(FGameplayTag EventTag, const FGameplayEventData& EventData, int32 OverrideGameplayLevel)
+{
+	FRPGGameplayEffectContainer* Container = EffectContainers.Find(EventTag);
+	if (Container == nullptr)
+	{
+		return FRPGGameplayEffectContainerSpec();
+	}
+
+	ARPGCharacterBase* OwningCharacter = Cast<ARPGCharacterBase>(GetOwningActorFromActorInfo());
+	URPGAbilitySystemComponent* AbilitySystem = URPGAbilitySystemComponent::GetAbilitySystemComonentFromActor(OwningCharacter);
+
+	if (OwningCharacter == nullptr || AbilitySystem == nullptr)
+	{
+		return FRPGGameplayEffectContainerSpec();
+	}
+
+	FRPGGameplayEffectContainerSpec ReturnSpec;
+	if (Container->TargetType.Get())
+	{
+		TArray<FHitResult> HitResults;
+		TArray<AActor*> TargetActors;
+		const URPGTargetType* TargetTypeCDO = Container->TargetType->GetDefaultObject<URPGTargetType>();
+		TargetTypeCDO->GetTargets(OwningCharacter, GetAvatarActorFromActorInfo(), EventData, HitResults, TargetActors);
+
+		ReturnSpec.AddTargets(HitResults, TargetActors);
+	}
+
+	float EffectLevel = OverrideGameplayLevel == INDEX_NONE ? GetAbilityLevel() : OverrideGameplayLevel;
+
+	for (const TSubclassOf<UGameplayEffect>& EffectClass : Container->TargetGameplayEffects)
+	{
+		ReturnSpec.TargetGameplayEffectSpecs.Add(MakeOutgoingGameplayEffectSpec(EffectClass, EffectLevel));
+	}
+
+	return ReturnSpec;
 }

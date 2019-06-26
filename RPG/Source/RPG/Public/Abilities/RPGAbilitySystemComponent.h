@@ -13,5 +13,7 @@ UCLASS()
 class RPG_API URPGAbilitySystemComponent : public UAbilitySystemComponent
 {
 	GENERATED_BODY()
-	
+
+public:
+	static URPGAbilitySystemComponent* GetAbilitySystemComonentFromActor(const AActor* Actor, bool LookForComponent = false);
 };

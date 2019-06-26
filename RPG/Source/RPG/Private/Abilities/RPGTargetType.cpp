@@ -21,7 +21,7 @@ void URPGTargetType_UseEventData::GetTargets_Implementation(ARPGCharacterBase* T
 		OutHitResults.Add(*FoundHitResult);
 	}
 	else if (EventData.Target)
-	{
+	{	
 		OutActors.Add(const_cast<AActor*>(EventData.Target));
 	}
 }
