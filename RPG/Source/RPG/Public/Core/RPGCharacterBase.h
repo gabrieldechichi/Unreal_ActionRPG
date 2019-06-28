@@ -5,12 +5,14 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
+#include "GameplayTagContainer.h"
 #include "RPGCharacterBase.generated.h"
 
 class URPGAbilitySystemComponent;
 class URPGAttributeSet;
 class UGameplayEffect;
 class UGameplayAbility;
+class URPGGameplayAbility;
 
 UCLASS()
 class RPG_API ARPGCharacterBase : public ACharacter, public IAbilitySystemInterface
@@ -31,6 +33,12 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = Abilities)
 	void Temp_GiveAbility(TSubclassOf<UGameplayAbility> Ability);
+
+	UFUNCTION(BlueprintCallable, Category = Abilities)
+	bool HasTags(const FGameplayTagContainer AbilityTags) const;
+
+	UFUNCTION(BlueprintCallable, Category = Abilities)
+	void GetActiveAbilitiesWithTags(FGameplayTagContainer AbilityTags, TArray<URPGGameplayAbility*>& ActiveAbilities) const;
 
 	UFUNCTION(BlueprintCallable)
 	int GetHealth() const;

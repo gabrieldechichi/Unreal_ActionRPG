@@ -4,6 +4,7 @@
 #include "RPGCharacterBase.h"
 #include "GameplayEffect.h"
 #include "Abilities/GameplayAbility.h"
+#include "Abilities/RPGGameplayAbility.h"
 #include "Abilities/RPGAbilitySystemComponent.h"
 #include "Abilities/RPGAttributeSet.h"
 
@@ -72,5 +73,20 @@ void ARPGCharacterBase::Temp_GiveAbility(TSubclassOf<UGameplayAbility> Ability)
 	if (AbilitySystemComponent)
 	{
 		AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(Ability, 1.0f, INDEX_NONE, this));
+	}
+}
+
+bool ARPGCharacterBase::HasTags(const FGameplayTagContainer AbilityTags) const
+{
+	FGameplayTagContainer OwnedTags;
+	AbilitySystemComponent->GetOwnedGameplayTags(OwnedTags);
+	return OwnedTags.HasAll(AbilityTags);
+}
+
+void ARPGCharacterBase::GetActiveAbilitiesWithTags(FGameplayTagContainer AbilityTags, TArray<URPGGameplayAbility*>& ActiveAbilities) const
+{
+	if (AbilitySystemComponent)
+	{
+		AbilitySystemComponent->GetActiveAbilitiesWithTags(AbilityTags, ActiveAbilities);
 	}
 }
