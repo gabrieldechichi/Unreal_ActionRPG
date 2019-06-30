@@ -40,12 +40,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Abilities)
 	void GetActiveAbilitiesWithTags(FGameplayTagContainer AbilityTags, TArray<URPGGameplayAbility*>& ActiveAbilities) const;
 
-	UFUNCTION(BlueprintCallable)
-	int GetHealth() const;
-
-	UFUNCTION(BlueprintCallable)
-	int GetMaxHealth() const;
-
 protected:
 	void AddStartupGameplayAbilities();
 
@@ -55,7 +49,7 @@ protected:
 	UPROPERTY()
 	URPGAbilitySystemComponent* AbilitySystemComponent;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	URPGAttributeSet* AttributeSet;
 
 	UPROPERTY()

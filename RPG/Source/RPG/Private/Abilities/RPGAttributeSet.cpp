@@ -5,6 +5,20 @@
 #include "GameplayEffectExtension.h"
 #include "RPG.h"
 
+#define HANDLE_ATTRIBUTE_CHANGE(AttributeName) \
+{ \
+	RaiseAttributeChangedEvent(Data, Get ##AttributeName## Attribute(), On ##AttributeName## Changed); \
+}
+
+#define HANDLE_ATTRIBUTE_CHANGE_WITH_CLAMP(AttributeName) \
+{ \
+	if (Data.EvaluatedData.Attribute == Get ##AttributeName## Attribute()) \
+	{ \
+		Set ##AttributeName## (FMath::Clamp(Get##AttributeName##(), 0.0f, GetMax##AttributeName## ())); \
+		HANDLE_ATTRIBUTE_CHANGE(AttributeName); \
+	} \
+}
+
 URPGAttributeSet::URPGAttributeSet()
 	: Health(1.f)
 	, MaxHealth(1.f)
@@ -23,10 +37,7 @@ void URPGAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, f
 
 void URPGAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
 {
-	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
-	{
-		SetHealth(FMath::Clamp(GetHealth(), 0.0f, GetMaxHealth()));
-	}
+	HANDLE_ATTRIBUTE_CHANGE_WITH_CLAMP(Health);
 }
 
 void URPGAttributeSet::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
@@ -48,6 +59,33 @@ void URPGAttributeSet::AdjustAttributeForNewMax(FGameplayAttributeData& Affected
 			: 1.0f;
 		const float NewValue = NewMaxValue * CurrentRatio;
 		AbilityComp->ApplyModToAttributeUnsafe(AffectedAttributeProperty, EGameplayModOp::Override, NewValue);
+	}
+}
+
+float URPGAttributeSet::GetPastAttributeValueFromModData(const FGameplayEffectModCallbackData& Data) const
+{
+	float CurrentValue = Data.EvaluatedData.Attribute.GetNumericValueChecked(this);
+	switch (Data.EvaluatedData.ModifierOp)
+	{
+	case EGameplayModOp::Additive:
+		return CurrentValue - Data.EvaluatedData.Magnitude;
+	case EGameplayModOp::Division:
+		return CurrentValue * Data.EvaluatedData.Magnitude;
+	case EGameplayModOp::Multiplicitive:
+		return CurrentValue / Data.EvaluatedData.Magnitude;
+	}
+	return CurrentValue;
+}
+
+void URPGAttributeSet::RaiseAttributeChangedEvent(const FGameplayEffectModCallbackData& Data, const FGameplayAttribute& AffectedAttribute, FOnAttributeChanged BroadcastEvent) const
+{
+	if (Data.EvaluatedData.Attribute == AffectedAttribute)
+	{
+		const FGameplayTagContainer& SourceTags = *Data.EffectSpec.CapturedSourceTags.GetAggregatedTags();
+		
+		float CurrentValue = Data.EvaluatedData.Attribute.GetNumericValueChecked(this);
+		float PreviousValue = GetPastAttributeValueFromModData(Data);
+		BroadcastEvent.Broadcast(CurrentValue, PreviousValue, SourceTags);
 	}
 }
 

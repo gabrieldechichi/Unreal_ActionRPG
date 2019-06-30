@@ -19,16 +19,6 @@ ARPGCharacterBase::ARPGCharacterBase()
 	bAbilitiesInitialized = false;
 }
 
-int ARPGCharacterBase::GetHealth() const
-{
-	return AttributeSet->GetHealth();
-}
-
-int ARPGCharacterBase::GetMaxHealth() const
-{
-	return AttributeSet->GetMaxHealth();
-}
-
 void ARPGCharacterBase::AddStartupGameplayAbilities()
 {
 	if (Role == ROLE_Authority && !bAbilitiesInitialized)
