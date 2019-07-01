@@ -37,6 +37,8 @@ void URPGAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, f
 
 void URPGAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
 {
+	Super::PostGameplayEffectExecute(Data);
+
 	HANDLE_ATTRIBUTE_CHANGE_WITH_CLAMP(Health);
 }
 
@@ -85,7 +87,14 @@ void URPGAttributeSet::RaiseAttributeChangedEvent(const FGameplayEffectModCallba
 		
 		float CurrentValue = Data.EvaluatedData.Attribute.GetNumericValueChecked(this);
 		float PreviousValue = GetPastAttributeValueFromModData(Data);
-		BroadcastEvent.Broadcast(CurrentValue, PreviousValue, SourceTags);
+		
+		FGameplayEffectContextHandle Context = Data.EffectSpec.GetContext();
+		UAbilitySystemComponent* SourceAbilitySystemComponent = Context.GetOriginalInstigatorAbilitySystemComponent();
+		AActor* Source = SourceAbilitySystemComponent != nullptr
+			? SourceAbilitySystemComponent->AbilityActorInfo->AvatarActor.Get() :
+			nullptr;
+		
+		BroadcastEvent.Broadcast(Source, PreviousValue, CurrentValue, Context, SourceTags);
 	}
 }
 

@@ -19,6 +19,12 @@ ARPGCharacterBase::ARPGCharacterBase()
 	bAbilitiesInitialized = false;
 }
 
+void ARPGCharacterBase::BeginPlay()
+{
+	Super::BeginPlay();
+	AttributeSet->OnHealthChanged.AddDynamic(this, &ARPGCharacterBase::OnHealthChanged);
+}
+
 void ARPGCharacterBase::AddStartupGameplayAbilities()
 {
 	if (Role == ROLE_Authority && !bAbilitiesInitialized)
@@ -78,5 +84,13 @@ void ARPGCharacterBase::GetActiveAbilitiesWithTags(FGameplayTagContainer Ability
 	if (AbilitySystemComponent)
 	{
 		AbilitySystemComponent->GetActiveAbilitiesWithTags(AbilityTags, ActiveAbilities);
+	}
+}
+
+void ARPGCharacterBase::OnHealthChanged(AActor* SourceActor, float PreviousValue, float NewValue, FGameplayEffectContextHandle Context, const FGameplayTagContainer& EventTags)
+{
+	if (NewValue < PreviousValue)
+	{
+		OnCombatDamageReceived(SourceActor, PreviousValue - NewValue, Context, EventTags);
 	}
 }

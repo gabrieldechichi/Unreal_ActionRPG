@@ -13,7 +13,7 @@
 	GAMEPLAYATTRIBUTE_VALUE_SETTER(PropertyName) \
 	GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnAttributeChanged, float, PreviousValue, float, NewValue, const struct FGameplayTagContainer&, EventTags);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FiveParams(FOnAttributeChanged, AActor*, SourceActor, float, PreviousValue, float, NewValue, FGameplayEffectContextHandle, Context, const struct FGameplayTagContainer&, EventTags);
 
 UCLASS()
 class RPG_API URPGAttributeSet : public UAttributeSet
@@ -27,15 +27,15 @@ public:
 	virtual void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Health", ReplicatedUsing=OnRep_Health)
+	UPROPERTY(ReplicatedUsing=OnRep_Health)
 	FGameplayAttributeData Health;
 	ATTRIBUTE_ACCESSORS(URPGAttributeSet, Health)
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = GetHealthValue)) 
 	int K2_GetHealth() const { return GetHealth(); }
-	UPROPERTY(BlueprintAssignable) 
+	UPROPERTY(BlueprintAssignable)
 	FOnAttributeChanged OnHealthChanged;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Health", ReplicatedUsing = OnRep_MaxHealth)
+	UPROPERTY(ReplicatedUsing = OnRep_MaxHealth)
 	FGameplayAttributeData MaxHealth;
 	ATTRIBUTE_ACCESSORS(URPGAttributeSet, MaxHealth)
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = GetMaxHealthValue))
@@ -44,6 +44,7 @@ public:
 protected:
 	void AdjustAttributeForNewMax(FGameplayAttributeData& AffectedAttribute, FGameplayAttributeData& MaxAttribute, float NewMaxValue, const FGameplayAttribute& AffectedAttributeProperty);
 	float GetPastAttributeValueFromModData(const FGameplayEffectModCallbackData& Data) const;
+
 	void RaiseAttributeChangedEvent(const FGameplayEffectModCallbackData& Data, const FGameplayAttribute& AffectedAttribute, FOnAttributeChanged BroadcastEvent) const;
 
 	UFUNCTION()
