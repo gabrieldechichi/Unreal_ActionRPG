@@ -41,6 +41,20 @@ public:
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = GetMaxHealthValue))
 	int K2_GetMaxHealth() const { return GetMaxHealth(); }
 
+	UPROPERTY(ReplicatedUsing=OnRep_Mana)
+	FGameplayAttributeData Mana;
+	ATTRIBUTE_ACCESSORS(URPGAttributeSet, Mana)
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = GetManaValue)) 
+	int K2_GetMana() const { return GetMana(); }
+	UPROPERTY(BlueprintAssignable)
+	FOnAttributeChanged OnManaChanged;
+
+	UPROPERTY(ReplicatedUsing = OnRep_MaxMana)
+	FGameplayAttributeData MaxMana;
+	ATTRIBUTE_ACCESSORS(URPGAttributeSet, MaxMana)
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = GetMaxManaValue))
+	int K2_GetMaxMana() const { return GetMaxMana(); }
+
 protected:
 	void AdjustAttributeForNewMax(FGameplayAttributeData& AffectedAttribute, FGameplayAttributeData& MaxAttribute, float NewMaxValue, const FGameplayAttribute& AffectedAttributeProperty);
 	float GetPastAttributeValueFromModData(const FGameplayEffectModCallbackData& Data) const;
@@ -48,8 +62,14 @@ protected:
 	void RaiseAttributeChangedEvent(const FGameplayEffectModCallbackData& Data, const FGameplayAttribute& AffectedAttribute, FOnAttributeChanged BroadcastEvent) const;
 
 	UFUNCTION()
-	void OnRep_Health();
+	void OnRep_Health() { GAMEPLAYATTRIBUTE_REPNOTIFY(URPGAttributeSet, Health); }
 
 	UFUNCTION()
-	void OnRep_MaxHealth();
+	void OnRep_MaxHealth() { GAMEPLAYATTRIBUTE_REPNOTIFY(URPGAttributeSet, MaxHealth); }
+
+	UFUNCTION()
+	void OnRep_Mana() { GAMEPLAYATTRIBUTE_REPNOTIFY(URPGAttributeSet, Mana); }
+
+	UFUNCTION()
+	void OnRep_MaxMana() { GAMEPLAYATTRIBUTE_REPNOTIFY(URPGAttributeSet, MaxMana); }
 };

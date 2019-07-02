@@ -19,9 +19,19 @@
 	} \
 }
 
+#define HANDLE_CHANGE_OF_MAX_ATTRIBUTE(AttributeName) \
+{ \
+	if (Attribute == GetMax ##AttributeName## Attribute()) \
+	{ \
+		AdjustAttributeForNewMax(##AttributeName##, Max##AttributeName##, NewValue, Get ##AttributeName## Attribute()); \
+	} \
+}
+
 URPGAttributeSet::URPGAttributeSet()
 	: Health(1.f)
 	, MaxHealth(1.f)
+	, Mana(1.f)
+	, MaxMana(1.f)
 {
 }
 
@@ -29,10 +39,8 @@ void URPGAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, f
 {
 	Super::PreAttributeChange(Attribute, NewValue);
 
-	if (Attribute == GetMaxHealthAttribute())
-	{
-		AdjustAttributeForNewMax(Health, MaxHealth, NewValue, GetHealthAttribute());
-	}
+	HANDLE_CHANGE_OF_MAX_ATTRIBUTE(Health);
+	HANDLE_CHANGE_OF_MAX_ATTRIBUTE(Mana);
 }
 
 void URPGAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
@@ -40,6 +48,7 @@ void URPGAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbac
 	Super::PostGameplayEffectExecute(Data);
 
 	HANDLE_ATTRIBUTE_CHANGE_WITH_CLAMP(Health);
+	HANDLE_ATTRIBUTE_CHANGE_WITH_CLAMP(Mana);
 }
 
 void URPGAttributeSet::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
@@ -48,6 +57,8 @@ void URPGAttributeSet::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty
 
 	DOREPLIFETIME(URPGAttributeSet, Health);
 	DOREPLIFETIME(URPGAttributeSet, MaxHealth);
+	DOREPLIFETIME(URPGAttributeSet, Mana);
+	DOREPLIFETIME(URPGAttributeSet, MaxMana);
 }
 
 void URPGAttributeSet::AdjustAttributeForNewMax(FGameplayAttributeData& AffectedAttribute, FGameplayAttributeData& MaxAttribute, float NewMaxValue, const FGameplayAttribute& AffectedAttributeProperty)
@@ -96,14 +107,4 @@ void URPGAttributeSet::RaiseAttributeChangedEvent(const FGameplayEffectModCallba
 		
 		BroadcastEvent.Broadcast(Source, PreviousValue, CurrentValue, Context, SourceTags);
 	}
-}
-
-void URPGAttributeSet::OnRep_Health()
-{
-	GAMEPLAYATTRIBUTE_REPNOTIFY(URPGAttributeSet, Health);
-}
-
-void URPGAttributeSet::OnRep_MaxHealth()
-{
-	GAMEPLAYATTRIBUTE_REPNOTIFY(URPGAttributeSet, MaxHealth);
 }
