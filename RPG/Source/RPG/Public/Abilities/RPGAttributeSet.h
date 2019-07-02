@@ -30,7 +30,7 @@ public:
 	UPROPERTY(ReplicatedUsing=OnRep_Health)
 	FGameplayAttributeData Health;
 	ATTRIBUTE_ACCESSORS(URPGAttributeSet, Health)
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = GetHealthValue)) 
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = GetHealth)) 
 	int K2_GetHealth() const { return GetHealth(); }
 	UPROPERTY(BlueprintAssignable)
 	FOnAttributeChanged OnHealthChanged;
@@ -38,13 +38,13 @@ public:
 	UPROPERTY(ReplicatedUsing = OnRep_MaxHealth)
 	FGameplayAttributeData MaxHealth;
 	ATTRIBUTE_ACCESSORS(URPGAttributeSet, MaxHealth)
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = GetMaxHealthValue))
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = GetMaxHealth))
 	int K2_GetMaxHealth() const { return GetMaxHealth(); }
 
 	UPROPERTY(ReplicatedUsing=OnRep_Mana)
 	FGameplayAttributeData Mana;
 	ATTRIBUTE_ACCESSORS(URPGAttributeSet, Mana)
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = GetManaValue)) 
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = GetMana)) 
 	int K2_GetMana() const { return GetMana(); }
 	UPROPERTY(BlueprintAssignable)
 	FOnAttributeChanged OnManaChanged;
@@ -52,8 +52,20 @@ public:
 	UPROPERTY(ReplicatedUsing = OnRep_MaxMana)
 	FGameplayAttributeData MaxMana;
 	ATTRIBUTE_ACCESSORS(URPGAttributeSet, MaxMana)
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = GetMaxManaValue))
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = GetMaxMana))
 	int K2_GetMaxMana() const { return GetMaxMana(); }
+
+	UPROPERTY(ReplicatedUsing=OnRep_AttackPower)
+	FGameplayAttributeData AttackPower;
+	ATTRIBUTE_ACCESSORS(URPGAttributeSet, AttackPower)
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = GetAttackPower))
+	int K2_GetAttackPower() const { return GetAttackPower(); }
+
+	UPROPERTY(ReplicatedUsing=OnRep_DefensePower)
+	FGameplayAttributeData DefensePower;
+	ATTRIBUTE_ACCESSORS(URPGAttributeSet, DefensePower)
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = GetDefensePower))
+	int K2_GetDefensePower() const { return GetDefensePower(); }
 
 protected:
 	void AdjustAttributeForNewMax(FGameplayAttributeData& AffectedAttribute, FGameplayAttributeData& MaxAttribute, float NewMaxValue, const FGameplayAttribute& AffectedAttributeProperty);
@@ -63,13 +75,17 @@ protected:
 
 	UFUNCTION()
 	void OnRep_Health() { GAMEPLAYATTRIBUTE_REPNOTIFY(URPGAttributeSet, Health); }
-
 	UFUNCTION()
 	void OnRep_MaxHealth() { GAMEPLAYATTRIBUTE_REPNOTIFY(URPGAttributeSet, MaxHealth); }
 
 	UFUNCTION()
 	void OnRep_Mana() { GAMEPLAYATTRIBUTE_REPNOTIFY(URPGAttributeSet, Mana); }
-
 	UFUNCTION()
 	void OnRep_MaxMana() { GAMEPLAYATTRIBUTE_REPNOTIFY(URPGAttributeSet, MaxMana); }
+
+	UFUNCTION()
+	void OnRep_AttackPower() { GAMEPLAYATTRIBUTE_REPNOTIFY(URPGAttributeSet, AttackPower); }
+
+	UFUNCTION()
+	void OnRep_DefensePower() { GAMEPLAYATTRIBUTE_REPNOTIFY(URPGAttributeSet, DefensePower); }
 };
