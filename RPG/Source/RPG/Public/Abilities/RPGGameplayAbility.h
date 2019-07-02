@@ -23,8 +23,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Ability, meta = (AutoCreateRefTerm = "EventData"))
 	virtual TArray<FActiveGameplayEffectHandle> ApplyEffectContainer(FGameplayTag EventTag, const FGameplayEventData& EventData, int32 OverrideGameplayLevel = -1);
 
+	UFUNCTION(BlueprintCallable, Category = Ability, meta = (AutoCreateRefTerm = "EventData"))
+	FRPGGameplayEffectContainerSpec MakeEffectContainerSpec(FGameplayTag EventTag, const FGameplayEventData & EventData, int32 OverrideGameplayLevel = -1);
+
 protected:
 	virtual TArray<FActiveGameplayEffectHandle> ApplyEffectContainerSpec(const FRPGGameplayEffectContainerSpec ContainerSpec);
-
-	FRPGGameplayEffectContainerSpec MakeEffectContainerSpec(FGameplayTag EventTag, const FGameplayEventData& EventData, int32 OverrideGameplayLevel = -1);
 };
