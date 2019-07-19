@@ -22,6 +22,12 @@ ARPGCharacterBase::ARPGCharacterBase()
 void ARPGCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (AbilitySystemComponent)
+	{
+		AbilitySystemComponent->InitAbilityActorInfo(this, this);
+	}
+	
 	AttributeSet->OnHealthChanged.AddDynamic(this, &ARPGCharacterBase::OnHealthChanged);
 }
 
@@ -45,7 +51,7 @@ void ARPGCharacterBase::PossessedBy(AController* NewController)
 	Super::PossessedBy(NewController);
 	if (AbilitySystemComponent)
 	{
-		AbilitySystemComponent->InitAbilityActorInfo(this, this);
+		AbilitySystemComponent->RefreshAbilityActorInfo();
 		AddStartupGameplayAbilities();
 	}
 }
