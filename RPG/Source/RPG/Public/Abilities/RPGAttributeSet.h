@@ -74,18 +74,19 @@ protected:
 	void RaiseAttributeChangedEvent(const FGameplayEffectModCallbackData& Data, const FGameplayAttribute& AffectedAttribute, FOnAttributeChanged BroadcastEvent) const;
 
 	UFUNCTION()
-	void OnRep_Health() { GAMEPLAYATTRIBUTE_REPNOTIFY(URPGAttributeSet, Health); }
+	void OnRep_Health();
+	
 	UFUNCTION()
-	void OnRep_MaxHealth() { GAMEPLAYATTRIBUTE_REPNOTIFY(URPGAttributeSet, MaxHealth); }
+	void OnRep_MaxHealth();
 
 	UFUNCTION()
-	void OnRep_Mana() { GAMEPLAYATTRIBUTE_REPNOTIFY(URPGAttributeSet, Mana); }
+	void OnRep_Mana();
 	UFUNCTION()
-	void OnRep_MaxMana() { GAMEPLAYATTRIBUTE_REPNOTIFY(URPGAttributeSet, MaxMana); }
+	void OnRep_MaxMana();
 
 	UFUNCTION()
-	void OnRep_AttackPower() { GAMEPLAYATTRIBUTE_REPNOTIFY(URPGAttributeSet, AttackPower); }
+	void OnRep_AttackPower();
 
 	UFUNCTION()
-	void OnRep_DefensePower() { GAMEPLAYATTRIBUTE_REPNOTIFY(URPGAttributeSet, DefensePower); }
+	void OnRep_DefensePower();
 };

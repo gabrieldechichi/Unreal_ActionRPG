@@ -55,10 +55,10 @@ void URPGAttributeSet::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(URPGAttributeSet, Health);
-	DOREPLIFETIME(URPGAttributeSet, MaxHealth);
-	DOREPLIFETIME(URPGAttributeSet, Mana);
-	DOREPLIFETIME(URPGAttributeSet, MaxMana);
+	DOREPLIFETIME_CONDITION_NOTIFY(URPGAttributeSet, Health, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(URPGAttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(URPGAttributeSet, Mana, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(URPGAttributeSet, MaxMana, COND_None, REPNOTIFY_Always);
 }
 
 void URPGAttributeSet::AdjustAttributeForNewMax(FGameplayAttributeData& AffectedAttribute, FGameplayAttributeData& MaxAttribute, float NewMaxValue, const FGameplayAttribute& AffectedAttributeProperty)
@@ -107,4 +107,34 @@ void URPGAttributeSet::RaiseAttributeChangedEvent(const FGameplayEffectModCallba
 		
 		BroadcastEvent.Broadcast(Source, PreviousValue, CurrentValue, Context, SourceTags);
 	}
+}
+
+void URPGAttributeSet::OnRep_Health()
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(URPGAttributeSet, Health);
+}
+
+void URPGAttributeSet::OnRep_MaxHealth()
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(URPGAttributeSet, MaxHealth);
+}
+
+void URPGAttributeSet::OnRep_Mana()
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(URPGAttributeSet, Mana);
+}
+
+void URPGAttributeSet::OnRep_MaxMana()
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(URPGAttributeSet, MaxMana);
+}
+
+void URPGAttributeSet::OnRep_AttackPower()
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(URPGAttributeSet, AttackPower);
+}
+
+void URPGAttributeSet::OnRep_DefensePower()
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(URPGAttributeSet, DefensePower);
 }
