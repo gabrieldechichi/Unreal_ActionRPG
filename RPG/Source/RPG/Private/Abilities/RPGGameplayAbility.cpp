@@ -21,6 +21,20 @@ TArray<FActiveGameplayEffectHandle> URPGGameplayAbility::ApplyEffectContainerSpe
 	return EffectHandles;
 }
 
+void URPGGameplayAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
+{
+	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+	if (ActorInfo->AvatarActor.IsValid() == false)
+	{
+		return;
+	}
+
+	if (URPGAbilitySystemComponent * AbilitySystem = URPGAbilitySystemComponent::GetAbilitySystemComonentFromActor(ActorInfo->AvatarActor.Get(), true))
+	{
+		AbilitySystem->RegisterPredictionEventsForAbilityInstance(this);
+	}
+}
+
 FRPGGameplayEffectContainerSpec URPGGameplayAbility::MakeEffectContainerSpec(FGameplayTag EventTag, const FGameplayEventData& EventData, int32 OverrideGameplayLevel)
 {
 	FRPGGameplayEffectContainer* Container = EffectContainers.Find(EventTag);
@@ -56,4 +70,9 @@ FRPGGameplayEffectContainerSpec URPGGameplayAbility::MakeEffectContainerSpec(FGa
 	}
 
 	return ReturnSpec;
+}
+
+void URPGGameplayAbility::OnServerAbilityActivationResponse(bool bAccepted)
+{
+	Receive_ServerAbilityActivationResponse(bAccepted);
 }

@@ -15,8 +15,12 @@ class RPG_API URPGAbilitySystemComponent : public UAbilitySystemComponent
 	GENERATED_BODY()
 
 public:
-	void GetActiveAbilitiesWithTags(const FGameplayTagContainer& GameplayTagContainer, TArray<class URPGGameplayAbility*>& ActiveAbilities) const;
-
 	static URPGAbilitySystemComponent* GetAbilitySystemComonentFromActor(const AActor* Actor, bool LookForComponent = false);
 
+	void GetActiveAbilitiesWithTags(const FGameplayTagContainer& GameplayTagContainer, TArray<class URPGGameplayAbility*>& ActiveAbilities) const;
+	void RegisterPredictionEventsForAbilityInstance(URPGGameplayAbility* Instance);
+
+protected:
+	virtual void OnServerAbilityCaughtUp(URPGGameplayAbility* Ability);
+	virtual void OnServerAbilityRejected(URPGGameplayAbility* Ability);
 };
