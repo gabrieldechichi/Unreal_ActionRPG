@@ -15,6 +15,16 @@ class UGameplayEffect;
 class UGameplayAbility;
 class URPGGameplayAbility;
 
+UENUM(BlueprintType)
+enum class EAbilityInputBindings : uint8
+{
+	UseAbility1 UMETA(DisplayName = "Use Spell 1"),
+	UseAbility2 UMETA(DisplayName = "Use Spell 2"),
+	UseAbility3 UMETA(DisplayName = "Use Spell 3"),
+	UseAbility4 UMETA(DisplayName = "Use Spell 4"),
+	WeaponAbility UMETA(DisplayName = "Use Weapon")
+};
+
 UCLASS()
 class RPG_API ARPGCharacterBase : public ACharacter, public IAbilitySystemInterface
 {
@@ -47,9 +57,13 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnCombatDamageReceived(AActor* SourceActor, float Damage, FGameplayEffectContextHandle Context, const struct FGameplayTagContainer& EventTags);
+	
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_OnCombatDamageReceived(AActor* SourceActor, float Damage, FGameplayEffectContextHandle Context, const struct FGameplayTagContainer& EventTags);
 
 protected:
 	void AddStartupGameplayAbilities();
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Abilities)
 	TArray<TSubclassOf<UGameplayEffect>> PassiveGameplayEffects;
