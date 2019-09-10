@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "Abilities/GameplayAbilityTargetTypes.h"
 #include "NWXGameplayAbilityFunctionLibrary.generated.h"
 
 class UAbilityTask;
@@ -20,4 +21,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Ability|Tasks")
 	static void CancelAbilityTask(UAbilityTask* AbilityTask);
 
+	/** Creates a target data with a source and destination location */
+	UFUNCTION(BlueprintPure, Category = "Ability|TargetData")
+	static FGameplayAbilityTargetDataHandle	AbilityTargetDataFromTransforms(const FGameplayAbilityTargetingLocationInfo& SourceLocation, const FGameplayAbilityTargetingLocationInfo& TargetLocation);
 };
