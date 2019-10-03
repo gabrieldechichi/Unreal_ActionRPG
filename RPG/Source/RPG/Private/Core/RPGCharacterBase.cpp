@@ -31,6 +31,11 @@ void ARPGCharacterBase::BeginPlay()
 	AttributeSet->OnHealthChanged.AddDynamic(this, &ARPGCharacterBase::OnHealthChanged);
 }
 
+void ARPGCharacterBase::Multicast_OnCombatDamageReceived_Implementation(AActor* SourceActor, float Damage, FGameplayEffectContextHandle Context, const FGameplayTagContainer& EventTags)
+{
+	OnCombatDamageReceived(SourceActor, Damage, Context, EventTags);
+}
+
 void ARPGCharacterBase::AddStartupGameplayAbilities()
 {
 	if (Role == ROLE_Authority && !bAbilitiesInitialized)
@@ -44,6 +49,12 @@ void ARPGCharacterBase::AddStartupGameplayAbilities()
 
 		bAbilitiesInitialized = true;
 	}
+}
+
+void ARPGCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	AbilitySystemComponent->BindAbilityActivationToInputComponent(PlayerInputComponent, FGameplayAbilityInputBinds("AbilityConfirm", "AbilityCancel", "EAbilityInputBindings"));
 }
 
 void ARPGCharacterBase::PossessedBy(AController* NewController)
@@ -97,6 +108,6 @@ void ARPGCharacterBase::OnHealthChanged(AActor* SourceActor, float PreviousValue
 {
 	if (NewValue < PreviousValue)
 	{
-		OnCombatDamageReceived(SourceActor, PreviousValue - NewValue, Context, EventTags);
+		Multicast_OnCombatDamageReceived(SourceActor, PreviousValue - NewValue, Context, EventTags);
 	}
 }

@@ -11,6 +11,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FPlayerMontageAndWaitForEventDelega
 
 /**
  * This task combines PlayMontageAndWait and WaitForEvent into one task, so you can wait for multiple types of activations such as from a melee combo
+ * DOES NOT WORK PREDICTIVELY IN MULTIPLAYER (YET)
  */
 UCLASS()
 class RPG_API UAbilityTask_PlayMontageAndWaitForEvent : public UAbilityTask
