@@ -5,12 +5,12 @@
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Abilities/GameplayAbilityTargetTypes.h"
-#include "NWXGameplayAbilityFunctionLibrary.generated.h"
+#include "RPGGameplayAbilityFunctionLibrary.generated.h"
 
 class UAbilityTask;
 
 UCLASS()
-class RPG_API UNWXGameplayAbilityFunctionLibrary : public UBlueprintFunctionLibrary
+class RPG_API URPGGameplayAbilityFunctionLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 

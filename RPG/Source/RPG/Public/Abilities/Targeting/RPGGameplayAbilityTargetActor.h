@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbilityTargetActor.h"
-#include "NWXGameplayAbilityTargetActor.generated.h"
+#include "RPGGameplayAbilityTargetActor.generated.h"
 
 RPG_API DECLARE_LOG_CATEGORY_EXTERN(LogTargetActor, Display, All);
 
@@ -12,7 +12,7 @@ RPG_API DECLARE_LOG_CATEGORY_EXTERN(LogTargetActor, Display, All);
  * Base class that allows TargetActors to be implemented in blueprint
  */
 UCLASS(Blueprintable, abstract, notplaceable)
-class RPG_API ANWXGameplayAbilityTargetActor : public AGameplayAbilityTargetActor
+class RPG_API ARPGGameplayAbilityTargetActor : public AGameplayAbilityTargetActor
 {
 	GENERATED_UCLASS_BODY()
 	
