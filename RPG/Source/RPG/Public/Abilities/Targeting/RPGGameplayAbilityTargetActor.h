@@ -26,16 +26,10 @@ public:
 	virtual void CancelTargeting() override;
 	//
 
-	UFUNCTION(BlueprintCallable, Category = "TargetActor")
-	FORCEINLINE UGameplayAbility* GetOwningAbility() const { return OwningAbility; }
-
-	UFUNCTION(BlueprintCallable, Category = "TargetActor")
-	FORCEINLINE APlayerController* GetPlayerController() const { return MasterPC; }
-
-	UFUNCTION(BlueprintCallable, Category = "TargetActor")
-	FORCEINLINE AActor* GetOwningActor() const { return SourceActor; }
-
 protected:
+	virtual void Cleanup();
+	virtual void OnAbilityEnded(UGameplayAbility* GameplayAbility);
+
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "StartTargeting"))
 	void ReceiveStartTargeting(UGameplayAbility* Ability);
 
@@ -47,4 +41,7 @@ protected:
 
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "CancelTargeting"))
 	void ReceiveCancelTargeting();
+
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "Cleanup"))
+	void ReceiveCleanup();
 };

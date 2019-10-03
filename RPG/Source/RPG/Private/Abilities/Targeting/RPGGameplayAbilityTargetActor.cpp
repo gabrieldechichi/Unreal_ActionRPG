@@ -16,6 +16,7 @@ void ARPGGameplayAbilityTargetActor::StartTargeting(UGameplayAbility* Ability)
 {
 	Super::StartTargeting(Ability);
 	SourceActor = Ability->GetCurrentActorInfo()->AvatarActor.Get();
+	Ability->OnGameplayAbilityEnded.AddUObject(this, &ARPGGameplayAbilityTargetActor::OnAbilityEnded);
 	ReceiveStartTargeting(Ability);
 }
 
@@ -53,4 +54,14 @@ void ARPGGameplayAbilityTargetActor::CancelTargeting()
 {
 	ReceiveCancelTargeting();
 	Super::CancelTargeting();
+}
+
+void ARPGGameplayAbilityTargetActor::Cleanup()
+{
+	ReceiveCleanup();
+}
+
+void ARPGGameplayAbilityTargetActor::OnAbilityEnded(UGameplayAbility* GameplayAbility)
+{
+	Cleanup();
 }
