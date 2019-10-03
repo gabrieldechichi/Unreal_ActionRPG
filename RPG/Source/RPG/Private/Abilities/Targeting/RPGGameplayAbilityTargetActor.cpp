@@ -9,6 +9,7 @@ ARPGGameplayAbilityTargetActor::ARPGGameplayAbilityTargetActor(const FObjectInit
 	: Super(ObjectInitializer)
 {
 	SetReplicates(true);
+	//In case some blueprint sets to replicate, let's at least try to save performance
 	bOnlyRelevantToOwner = true;
 }
 
@@ -16,7 +17,16 @@ void ARPGGameplayAbilityTargetActor::StartTargeting(UGameplayAbility* Ability)
 {
 	Super::StartTargeting(Ability);
 	SourceActor = Ability->GetCurrentActorInfo()->AvatarActor.Get();
+	MasterPC = Ability->GetCurrentActorInfo()->PlayerController.Get();
+
+	//TODO: Maybe allow for not listening for input
+	if (bListenToInput && MasterPC && MasterPC->IsLocalPlayerController())
+	{
+		EnableInput(MasterPC);
+	}
+
 	Ability->OnGameplayAbilityEnded.AddUObject(this, &ARPGGameplayAbilityTargetActor::OnAbilityEnded);
+
 	ReceiveStartTargeting(Ability);
 }
 
@@ -64,4 +74,14 @@ void ARPGGameplayAbilityTargetActor::Cleanup()
 void ARPGGameplayAbilityTargetActor::OnAbilityEnded(UGameplayAbility* GameplayAbility)
 {
 	Cleanup();
+}
+
+void ARPGGameplayAbilityTargetActor::K2_ConfirmTargeting()
+{
+	ConfirmTargeting();
+}
+
+void ARPGGameplayAbilityTargetActor::K2_CancelTargeting()
+{
+	CancelTargeting();
 }

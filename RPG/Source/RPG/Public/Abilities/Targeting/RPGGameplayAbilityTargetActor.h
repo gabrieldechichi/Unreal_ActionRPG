@@ -24,7 +24,16 @@ public:
 	virtual void ConfirmTargetingAndContinue() override;
 	virtual bool OnReplicatedTargetDataReceived(FGameplayAbilityTargetDataHandle& Data) const override;
 	virtual void CancelTargeting() override;
-	//
+	//	
+
+	UFUNCTION(BlueprintCallable, Category = "TargetActor")
+	FORCEINLINE UGameplayAbility* GetOwningAbility() const { return OwningAbility; }
+
+	UFUNCTION(BlueprintCallable, Category = "TargetActor")
+	FORCEINLINE APlayerController* GetPlayerController() const { return MasterPC; }
+
+	UFUNCTION(BlueprintCallable, Category = "TargetActor")
+	FORCEINLINE AActor* GetOwningActor() const { return SourceActor; }
 
 protected:
 	virtual void Cleanup();
@@ -44,4 +53,16 @@ protected:
 
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "Cleanup"))
 	void ReceiveCleanup();
+
+	UFUNCTION(BlueprintCallable, Category = "TargetActor", meta = (DisplayName = "ConfirmTargeting"))
+	void K2_ConfirmTargeting();
+
+	UFUNCTION(BlueprintCallable, Category = "TargetActor", meta = (DisplayName = " CancelTargeting"))
+	void K2_CancelTargeting();
+
+protected:
+	// Whether this target actor listen to input (priority over Pawn and PlayerController)
+	// We don't want to use 'AutoReceiveInput' for two reasons: 1 - We only want to listen if the OwningAbility is owned by a PC, 2 - We want to be able to enable/disable input on StartTargeting and CleanUp
+	UPROPERTY(EditDefaultsOnly, Category = "TargetActor")
+	bool bListenToInput = true;
 };
