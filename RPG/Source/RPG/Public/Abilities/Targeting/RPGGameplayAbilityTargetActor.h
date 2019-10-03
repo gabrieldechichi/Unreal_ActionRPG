@@ -8,6 +8,8 @@
 
 RPG_API DECLARE_LOG_CATEGORY_EXTERN(LogTargetActor, Display, All);
 
+class UGameplayAbility;
+
 /**
  * Base class that allows TargetActors to be implemented in blueprint
  */
@@ -15,13 +17,23 @@ UCLASS(Blueprintable, abstract, notplaceable)
 class RPG_API ARPGGameplayAbilityTargetActor : public AGameplayAbilityTargetActor
 {
 	GENERATED_UCLASS_BODY()
-	
+
 public:
 	//AGameplayAbilityTargetActor interface
 	virtual void StartTargeting(UGameplayAbility* Ability) override;
 	virtual void ConfirmTargetingAndContinue() override;
 	virtual bool OnReplicatedTargetDataReceived(FGameplayAbilityTargetDataHandle& Data) const override;
+	virtual void CancelTargeting() override;
 	//
+
+	UFUNCTION(BlueprintCallable, Category = "TargetActor")
+	FORCEINLINE UGameplayAbility* GetOwningAbility() const { return OwningAbility; }
+
+	UFUNCTION(BlueprintCallable, Category = "TargetActor")
+	FORCEINLINE APlayerController* GetPlayerController() const { return MasterPC; }
+
+	UFUNCTION(BlueprintCallable, Category = "TargetActor")
+	FORCEINLINE AActor* GetOwningActor() const { return SourceActor; }
 
 protected:
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "StartTargeting"))
@@ -32,4 +44,7 @@ protected:
 
 	UFUNCTION(BlueprintNativeEvent)
 	void ValidateClientTargetData(const FGameplayAbilityTargetDataHandle& Data, bool& bIsTargetDataValid) const;
+
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "CancelTargeting"))
+	void ReceiveCancelTargeting();
 };
