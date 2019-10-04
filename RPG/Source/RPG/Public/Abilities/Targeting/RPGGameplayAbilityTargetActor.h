@@ -26,6 +26,8 @@ public:
 	virtual void CancelTargeting() override;
 	//	
 
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
 	UFUNCTION(BlueprintCallable, Category = "TargetActor")
 	FORCEINLINE UGameplayAbility* GetOwningAbility() const { return OwningAbility; }
 
@@ -37,7 +39,6 @@ public:
 
 protected:
 	virtual void Cleanup();
-	virtual void OnAbilityEnded(UGameplayAbility* GameplayAbility);
 
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "StartTargeting"))
 	void ReceiveStartTargeting(UGameplayAbility* Ability);

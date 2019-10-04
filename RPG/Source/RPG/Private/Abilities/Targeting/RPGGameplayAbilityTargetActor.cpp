@@ -25,8 +25,6 @@ void ARPGGameplayAbilityTargetActor::StartTargeting(UGameplayAbility* Ability)
 		EnableInput(MasterPC);
 	}
 
-	Ability->OnGameplayAbilityEnded.AddUObject(this, &ARPGGameplayAbilityTargetActor::OnAbilityEnded);
-
 	ReceiveStartTargeting(Ability);
 }
 
@@ -66,14 +64,15 @@ void ARPGGameplayAbilityTargetActor::CancelTargeting()
 	Super::CancelTargeting();
 }
 
+void ARPGGameplayAbilityTargetActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+	Cleanup();
+}
+
 void ARPGGameplayAbilityTargetActor::Cleanup()
 {
 	ReceiveCleanup();
-}
-
-void ARPGGameplayAbilityTargetActor::OnAbilityEnded(UGameplayAbility* GameplayAbility)
-{
-	Cleanup();
 }
 
 void ARPGGameplayAbilityTargetActor::K2_ConfirmTargeting()
