@@ -8,12 +8,12 @@
 #include "GameplayTagContainer.h"
 #include "Abilities/GameplayAbilityTargetActor.h"
 #include "Abilities/Tasks/AbilityTask.h"
-#include "AbilityTask_WaitTargetDataImproved.generated.h"
+#include "AbilityTask_RPGWaitTargetData.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FWaitTargetDataDelegate, const FGameplayAbilityTargetDataHandle &, Data);
 
 UENUM(BlueprintType)
-namespace EGameplayTargetConfirmation
+namespace ERPGGameplayTargetConfirmation
 {
 	/** Describes how the targeting information is confirmed */
 	enum Type
@@ -29,8 +29,8 @@ namespace EGameplayTargetConfirmation
 /**
  * This offers the some function was Epic's WaitTargetData, but it doesn't memory leak and will support actor caching in the future
  */
-UCLASS()
-class RPG_API UAbilityTask_WaitTargetDataImproved : public UAbilityTask
+UCLASS(notplaceable)
+class RPG_API UAbilityTask_RPGWaitTargetData : public UAbilityTask
 {
 	GENERATED_UCLASS_BODY()
 
@@ -54,7 +54,7 @@ class RPG_API UAbilityTask_WaitTargetDataImproved : public UAbilityTask
 
 	/** Spawns target actor and waits for it to return valid data or to be canceled. */
 	UFUNCTION(BlueprintCallable, meta = (HidePin = "OwningAbility", DefaultToSelf = "OwningAbility", BlueprintInternalUseOnly = "true", HideSpawnParms = "Instigator"), Category = "Ability|Tasks")
-	static UAbilityTask_WaitTargetDataImproved *WaitTargetDataImproved(UGameplayAbility *OwningAbility, FName TaskInstanceName, TEnumAsByte<EGameplayTargetingConfirmation::Type> ConfirmationType, TSubclassOf<AGameplayAbilityTargetActor> Class);
+	static UAbilityTask_RPGWaitTargetData *RPGWaitTargetData(UGameplayAbility *OwningAbility, FName TaskInstanceName, TEnumAsByte<ERPGGameplayTargetConfirmation::Type> ConfirmationType, TSubclassOf<AGameplayAbilityTargetActor> Class);
 
 	UFUNCTION(BlueprintCallable, meta = (HidePin = "OwningAbility", DefaultToSelf = "OwningAbility", BlueprintInternalUseOnly = "true"), Category = "Abilities")
 	bool BeginSpawningActor(UGameplayAbility *OwningAbility, TSubclassOf<AGameplayAbilityTargetActor> Class, AGameplayAbilityTargetActor *&SpawnedActor);
@@ -80,7 +80,7 @@ protected:
 	UPROPERTY()
 	AGameplayAbilityTargetActor *TargetActor;
 
-	TEnumAsByte<EGameplayTargetingConfirmation::Type> ConfirmationType;
+	TEnumAsByte<ERPGGameplayTargetConfirmation::Type> ConfirmationType;
 
 	FDelegateHandle OnTargetDataReplicatedCallbackDelegateHandle;
 };

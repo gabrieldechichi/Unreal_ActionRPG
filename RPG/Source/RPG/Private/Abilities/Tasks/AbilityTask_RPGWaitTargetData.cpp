@@ -1,25 +1,25 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "AbilityTask_WaitTargetDataImproved.h"
+#include "AbilityTask_RPGWaitTargetData.h"
 #include "EngineGlobals.h"
 #include "Engine/Engine.h"
 #include "AbilitySystemComponent.h"
 
-UAbilityTask_WaitTargetDataImproved::UAbilityTask_WaitTargetDataImproved(const FObjectInitializer &ObjectInitializer)
+UAbilityTask_RPGWaitTargetData::UAbilityTask_RPGWaitTargetData(const FObjectInitializer &ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 }
 
-UAbilityTask_WaitTargetDataImproved *UAbilityTask_WaitTargetDataImproved::WaitTargetDataImproved(UGameplayAbility *OwningAbility, FName TaskInstanceName, TEnumAsByte<EGameplayTargetingConfirmation::Type> ConfirmationType, TSubclassOf<AGameplayAbilityTargetActor> InTargetClass)
+UAbilityTask_RPGWaitTargetData *UAbilityTask_RPGWaitTargetData::RPGWaitTargetData(UGameplayAbility *OwningAbility, FName TaskInstanceName, TEnumAsByte<ERPGGameplayTargetConfirmation::Type> ConfirmationType, TSubclassOf<AGameplayAbilityTargetActor> InTargetClass)
 {
-	UAbilityTask_WaitTargetDataImproved *MyObj = NewAbilityTask<UAbilityTask_WaitTargetDataImproved>(OwningAbility, TaskInstanceName); //Register for task list here, providing a given FName as a key
+	UAbilityTask_RPGWaitTargetData *MyObj = NewAbilityTask<UAbilityTask_RPGWaitTargetData>(OwningAbility, TaskInstanceName); //Register for task list here, providing a given FName as a key
 	MyObj->TargetClass = InTargetClass;
 	MyObj->TargetActor = nullptr;
 	MyObj->ConfirmationType = ConfirmationType;
 	return MyObj;
 }
 
-bool UAbilityTask_WaitTargetDataImproved::BeginSpawningActor(UGameplayAbility *OwningAbility, TSubclassOf<AGameplayAbilityTargetActor> InTargetClass, AGameplayAbilityTargetActor *&SpawnedActor)
+bool UAbilityTask_RPGWaitTargetData::BeginSpawningActor(UGameplayAbility *OwningAbility, TSubclassOf<AGameplayAbilityTargetActor> InTargetClass, AGameplayAbilityTargetActor *&SpawnedActor)
 {
 	SpawnedActor = nullptr;
 
@@ -49,7 +49,7 @@ bool UAbilityTask_WaitTargetDataImproved::BeginSpawningActor(UGameplayAbility *O
 	return (SpawnedActor != nullptr);
 }
 
-void UAbilityTask_WaitTargetDataImproved::FinishSpawningActor(UGameplayAbility *OwningAbility, AGameplayAbilityTargetActor *SpawnedActor)
+void UAbilityTask_RPGWaitTargetData::FinishSpawningActor(UGameplayAbility *OwningAbility, AGameplayAbilityTargetActor *SpawnedActor)
 {
 	if (SpawnedActor && !SpawnedActor->IsPendingKill())
 	{
@@ -62,10 +62,11 @@ void UAbilityTask_WaitTargetDataImproved::FinishSpawningActor(UGameplayAbility *
 		FinalizeTargetActor(SpawnedActor);
 	}
 
+	//K2Node_LatentGameplayTaskCall does not call ReadyForActivation if we spawn an actor, so this needs to be called manually
 	ReadyForActivation();
 }
 
-bool UAbilityTask_WaitTargetDataImproved::ShouldSpawnTargetActor() const
+bool UAbilityTask_RPGWaitTargetData::ShouldSpawnTargetActor() const
 {
 	check(TargetClass);
 	check(Ability);
@@ -82,7 +83,7 @@ bool UAbilityTask_WaitTargetDataImproved::ShouldSpawnTargetActor() const
 	return (bReplicates || bIsLocallyControlled || bShouldProduceTargetDataOnServer);
 }
 
-void UAbilityTask_WaitTargetDataImproved::InitializeTargetActor(AGameplayAbilityTargetActor *SpawnedActor) const
+void UAbilityTask_RPGWaitTargetData::InitializeTargetActor(AGameplayAbilityTargetActor *SpawnedActor) const
 {
 	check(SpawnedActor);
 	check(Ability);
@@ -90,11 +91,11 @@ void UAbilityTask_WaitTargetDataImproved::InitializeTargetActor(AGameplayAbility
 	SpawnedActor->MasterPC = Ability->GetCurrentActorInfo()->PlayerController.Get();
 
 	// If we spawned the target actor, always register the callbacks for when the data is ready.
-	SpawnedActor->TargetDataReadyDelegate.AddUObject(this, &UAbilityTask_WaitTargetDataImproved::OnTargetDataReadyCallback);
-	SpawnedActor->CanceledDelegate.AddUObject(this, &UAbilityTask_WaitTargetDataImproved::OnTargetDataCancelledCallback);
+	SpawnedActor->TargetDataReadyDelegate.AddUObject(this, &UAbilityTask_RPGWaitTargetData::OnTargetDataReadyCallback);
+	SpawnedActor->CanceledDelegate.AddUObject(this, &UAbilityTask_RPGWaitTargetData::OnTargetDataCancelledCallback);
 }
 
-void UAbilityTask_WaitTargetDataImproved::FinalizeTargetActor(AGameplayAbilityTargetActor *SpawnedActor) const
+void UAbilityTask_RPGWaitTargetData::FinalizeTargetActor(AGameplayAbilityTargetActor *SpawnedActor) const
 {
 	check(SpawnedActor);
 	check(Ability);
@@ -109,19 +110,14 @@ void UAbilityTask_WaitTargetDataImproved::FinalizeTargetActor(AGameplayAbilityTa
 		// If instant confirm, then stop targeting immediately.
 		// Note this is kind of bad: we should be able to just call a static func on the CDO to do this.
 		// But then we wouldn't get to set ExposeOnSpawnParameters.
-		if (ConfirmationType == EGameplayTargetingConfirmation::Instant)
+		if (ConfirmationType == ERPGGameplayTargetConfirmation::Instant)
 		{
 			SpawnedActor->ConfirmTargeting();
-		}
-		else if (ConfirmationType == EGameplayTargetingConfirmation::UserConfirmed)
-		{
-			// Bind to the Cancel/Confirm Delegates (called from local confirm or from repped confirm)
-			SpawnedActor->BindToConfirmCancelInputs();
 		}
 	}
 }
 
-void UAbilityTask_WaitTargetDataImproved::RegisterTargetDataCallbacks()
+void UAbilityTask_RPGWaitTargetData::RegisterTargetDataCallbacks()
 {
 	if (!ensure(IsPendingKill() == false))
 	{
@@ -147,8 +143,8 @@ void UAbilityTask_WaitTargetDataImproved::RegisterTargetDataCallbacks()
 			FPredictionKey ActivationPredictionKey = GetActivationPredictionKey();
 
 			//Since multifire is supported, we still need to hook up the callbacks
-			AbilitySystemComponent->AbilityTargetDataSetDelegate(SpecHandle, ActivationPredictionKey).AddUObject(this, &UAbilityTask_WaitTargetDataImproved::OnTargetDataReplicatedCallback);
-			AbilitySystemComponent->AbilityTargetDataCancelledDelegate(SpecHandle, ActivationPredictionKey).AddUObject(this, &UAbilityTask_WaitTargetDataImproved::OnTargetDataReplicatedCancelledCallback);
+			AbilitySystemComponent->AbilityTargetDataSetDelegate(SpecHandle, ActivationPredictionKey).AddUObject(this, &UAbilityTask_RPGWaitTargetData::OnTargetDataReplicatedCallback);
+			AbilitySystemComponent->AbilityTargetDataCancelledDelegate(SpecHandle, ActivationPredictionKey).AddUObject(this, &UAbilityTask_RPGWaitTargetData::OnTargetDataReplicatedCancelledCallback);
 
 			AbilitySystemComponent->CallReplicatedTargetDataDelegatesIfSet(SpecHandle, ActivationPredictionKey);
 
@@ -158,7 +154,7 @@ void UAbilityTask_WaitTargetDataImproved::RegisterTargetDataCallbacks()
 }
 
 /** Valid TargetData was replicated to use (we are server, was sent from client) */
-void UAbilityTask_WaitTargetDataImproved::OnTargetDataReplicatedCallback(const FGameplayAbilityTargetDataHandle &Data, FGameplayTag ActivationTag)
+void UAbilityTask_RPGWaitTargetData::OnTargetDataReplicatedCallback(const FGameplayAbilityTargetDataHandle &Data, FGameplayTag ActivationTag)
 {
 	check(AbilitySystemComponent);
 
@@ -189,14 +185,11 @@ void UAbilityTask_WaitTargetDataImproved::OnTargetDataReplicatedCallback(const F
 		}
 	}
 
-	if (ConfirmationType != EGameplayTargetingConfirmation::CustomMulti)
-	{
-		EndTask();
-	}
+	EndTask();
 }
 
 /** Client canceled this Targeting Task (we are the server) */
-void UAbilityTask_WaitTargetDataImproved::OnTargetDataReplicatedCancelledCallback()
+void UAbilityTask_RPGWaitTargetData::OnTargetDataReplicatedCancelledCallback()
 {
 	check(AbilitySystemComponent);
 	if (ShouldBroadcastAbilityTaskDelegates())
@@ -207,7 +200,7 @@ void UAbilityTask_WaitTargetDataImproved::OnTargetDataReplicatedCancelledCallbac
 }
 
 /** The TargetActor we spawned locally has called back with valid target data */
-void UAbilityTask_WaitTargetDataImproved::OnTargetDataReadyCallback(const FGameplayAbilityTargetDataHandle &Data)
+void UAbilityTask_RPGWaitTargetData::OnTargetDataReadyCallback(const FGameplayAbilityTargetDataHandle &Data)
 {
 	check(AbilitySystemComponent);
 	if (!Ability)
@@ -225,7 +218,7 @@ void UAbilityTask_WaitTargetDataImproved::OnTargetDataReadyCallback(const FGamep
 			FGameplayTag ApplicationTag; // Fixme: where would this be useful?
 			AbilitySystemComponent->CallServerSetReplicatedTargetData(GetAbilitySpecHandle(), GetActivationPredictionKey(), Data, ApplicationTag, AbilitySystemComponent->ScopedPredictionKey);
 		}
-		else if (ConfirmationType == EGameplayTargetingConfirmation::UserConfirmed)
+		else if (ConfirmationType == ERPGGameplayTargetConfirmation::TargetActorConfirmed)
 		{
 			// We aren't going to send the target data, but we will send a generic confirmed message.
 			AbilitySystemComponent->ServerSetReplicatedEvent(EAbilityGenericReplicatedEvent::GenericConfirm, GetAbilitySpecHandle(), GetActivationPredictionKey(), AbilitySystemComponent->ScopedPredictionKey);
@@ -237,14 +230,11 @@ void UAbilityTask_WaitTargetDataImproved::OnTargetDataReadyCallback(const FGamep
 		ValidData.Broadcast(Data);
 	}
 
-	if (ConfirmationType != EGameplayTargetingConfirmation::CustomMulti)
-	{
-		EndTask();
-	}
+	EndTask();
 }
 
 /** The TargetActor we spawned locally has called back with a cancel event (they still include the 'last/best' targetdata but the consumer of this may want to discard it) */
-void UAbilityTask_WaitTargetDataImproved::OnTargetDataCancelledCallback(const FGameplayAbilityTargetDataHandle &Data)
+void UAbilityTask_RPGWaitTargetData::OnTargetDataCancelledCallback(const FGameplayAbilityTargetDataHandle &Data)
 {
 	check(AbilitySystemComponent);
 
@@ -266,7 +256,7 @@ void UAbilityTask_WaitTargetDataImproved::OnTargetDataCancelledCallback(const FG
 	EndTask();
 }
 
-void UAbilityTask_WaitTargetDataImproved::OnDestroy(bool AbilityEnded)
+void UAbilityTask_RPGWaitTargetData::OnDestroy(bool AbilityEnded)
 {
 	if (TargetActor)
 	{
@@ -276,7 +266,7 @@ void UAbilityTask_WaitTargetDataImproved::OnDestroy(bool AbilityEnded)
 	Super::OnDestroy(AbilityEnded);
 }
 
-bool UAbilityTask_WaitTargetDataImproved::ShouldReplicateDataToServer() const
+bool UAbilityTask_RPGWaitTargetData::ShouldReplicateDataToServer() const
 {
 	if (!Ability || !TargetActor)
 	{
