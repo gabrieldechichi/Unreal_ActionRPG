@@ -24,3 +24,26 @@ FGameplayAbilityTargetDataHandle URPGGameplayAbilityFunctionLibrary::AbilityTarg
 	Handle.Data.Add(TSharedPtr<FGameplayAbilityTargetData_TransformInfo>(NewData));
 	return Handle;
 }
+
+FGameplayAbilityTargetDataHandle URPGGameplayAbilityFunctionLibrary::AbilityTargetDataFromClass(UClass* TargetClass)
+{
+	FGameplayAbilityTargetData_Class* NewData = new FGameplayAbilityTargetData_Class();
+	NewData->TargetClass = TargetClass;
+
+	FGameplayAbilityTargetDataHandle Handle;
+	Handle.Data.Add(TSharedPtr<FGameplayAbilityTargetData_Class>(NewData));
+	return Handle;
+}
+
+UClass * URPGGameplayAbilityFunctionLibrary::GetClassFromTargetData(const FGameplayAbilityTargetDataHandle & TargetData, int32 Index)
+{
+	if (TargetData.Data.IsValidIndex(Index))
+	{
+		const FGameplayAbilityTargetData* Data = TargetData.Data[Index].Get();
+		if (FGameplayAbilityTargetData_Class* TargetData_Class = CastTargetData<FGameplayAbilityTargetData_Class>(Data))
+		{
+			return TargetData_Class->GetTargetClass();
+		}
+	}
+	return nullptr;
+}

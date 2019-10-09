@@ -10,3 +10,10 @@ bool FGameplayAbilityTargetData_TransformInfo::NetSerialize(FArchive &Ar, UPacka
 	bOutSuccess = true;
 	return true;
 }
+
+bool FGameplayAbilityTargetData_Class::NetSerialize(FArchive & Ar, UPackageMap * Map, bool & bOutSuccess)
+{
+	Ar << TargetClass;
+	bOutSuccess = true;
+	return true;
+}

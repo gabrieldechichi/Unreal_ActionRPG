@@ -24,4 +24,10 @@ public:
 	/** Creates a target data with a source and destination location */
 	UFUNCTION(BlueprintPure, Category = "Ability|TargetData")
 	static FGameplayAbilityTargetDataHandle	AbilityTargetDataFromTransforms(const FGameplayAbilityTargetingLocationInfo& SourceLocation, const FGameplayAbilityTargetingLocationInfo& TargetLocation);
+
+	UFUNCTION(BlueprintPure, Category = "Ability|TargetData")
+	static FGameplayAbilityTargetDataHandle AbilityTargetDataFromClass(UClass* TargetClass);
+
+	UFUNCTION(BlueprintPure, Category = "Ability|TargetData")
+	static UClass* GetClassFromTargetData(const FGameplayAbilityTargetDataHandle& TargetData, int32 Index);
 };

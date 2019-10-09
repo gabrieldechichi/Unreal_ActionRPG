@@ -6,6 +6,13 @@
 #include "Abilities/GameplayAbilityTargetTypes.h"
 #include "RPGGameplayAbilityTargetTypes.generated.h"
 
+
+template <typename To, typename From>
+FORCEINLINE To* CastTargetData(From* Src)
+{
+	return Src && Src->GetScriptStruct()->IsChildOf(To::StaticStruct()) ? (To*) Src : nullptr;
+}
+
 /** Exactly like FGameplayAbiltyTargetData_LocationInfo, but correctly overrides GetEndPoitnTransform()*/
 USTRUCT(BlueprintType)
 struct RPG_API FGameplayAbilityTargetData_TransformInfo : public FGameplayAbilityTargetData
@@ -64,6 +71,43 @@ struct RPG_API FGameplayAbilityTargetData_TransformInfo : public FGameplayAbilit
 
 template<>
 struct TStructOpsTypeTraits<FGameplayAbilityTargetData_TransformInfo> : public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_TransformInfo>
+{
+	enum
+	{
+		WithNetSerializer = true
+	};
+};
+
+//////////////////////////////////////////////////////////////////////////
+
+USTRUCT(BlueprintType)
+struct RPG_API FGameplayAbilityTargetData_Class : public FGameplayAbilityTargetData
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY()
+	UClass* TargetClass;
+
+	UClass* GetTargetClass() const
+	{
+		return TargetClass;
+	}
+
+	virtual UScriptStruct* GetScriptStruct() const override
+	{
+		return FGameplayAbilityTargetData_Class::StaticStruct();
+	}
+
+	virtual FString ToString() const override
+	{
+		return TEXT("FGameplayAbilityTargetData_Class");
+	}
+
+	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
+};
+
+template<>
+struct TStructOpsTypeTraits<FGameplayAbilityTargetData_Class> : public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_Class>
 {
 	enum
 	{
